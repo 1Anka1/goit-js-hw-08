@@ -1,42 +1,42 @@
 import throttle from 'lodash.throttle';
 
-const STORAGE_KEY = 'feedback-form-state';
-
 const refs = {
-  form: document.querySelector('.feedback-form'),
-  message: document.querySelector('.feedback-form textarea'),
-  email: document.querySelector('.feedback-form input'),
-};
-
-refs.form.addEventListener('input', throttle(onFormData, 500));
-refs.form.addEventListener('submit', onFormSubmit);
-
+    form: document.querySelector('.feedback-form'),
+    textarea: document.querySelector('.feedback-form textarea'),
+    email: document.querySelector('.feedback-form input[type=email]'),
+}
+const input = refs.form.elements;
+const LOKALSTORAGE_KEY = 'feedback-form-state';
+const savedData = localStorage.getItem(LOKALSTORAGE_KEY);
 const formData = {};
 
-dataFromLocalStorage();
+refs.form.addEventListener('submit', onFormSubmit);
+refs.email.addEventListener('input', throttle(onInput, 500));
+refs.textarea.addEventListener('input', throttle(onInput, 500));
 
-function onFormData(e) {
-  formData[e.target.name] = e.target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+function inputValue () {
+  formData.email = input.email.value;
+  formData.message = input.message.value;
 }
 
-function onFormSubmit(e) {
-  e.preventDefault();
-
-  if (refs.email.value === '' || refs.message.value === '') {
-    return alert ('Заповни будь-ласка поля!');
-  }
-  formData.email = refs.email.value;
-  formData.message = refs.message.value;
-  e.currentTarget.reset();
-  localStorage.removeItem(STORAGE_KEY);
+if (savedData) {
+    const formData = JSON.parse(savedData);
+    refs.email.value = formData.email;
+    refs.textarea.value = formData.message;
 }
 
-function dataFromLocalStorage() {
-  const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  if (data) {
-    refs.email.value = data.email;
-    refs.message.value = data.message;
-    console.log(data);
-  }
+function onInput(event) {
+   inputValue();
+    localStorage.setItem(LOKALSTORAGE_KEY, JSON.stringify(formData));
+}
+function onFormSubmit(event) {
+    event.preventDefault();
+    inputValue();
+    if (input.email.value === '' || input.message.value === '') {
+        alert('Заповни будь-ласка поля!');
+    } else {
+    console.log(formData);
+    event.currentTarget.reset();
+    localStorage.removeItem(LOKALSTORAGE_KEY);
+    }
 }
