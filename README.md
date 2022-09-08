@@ -1,5 +1,3 @@
-**Read in other languages: [Русский](README.md), [Polski](README.pl.md).**
-
 # Task 1 - SimpleLightbox library
 Do this task in the 01-gallery.html and 01-gallery.js files. Break it down into several subtasks:
 
